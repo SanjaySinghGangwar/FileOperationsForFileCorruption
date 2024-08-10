@@ -35,7 +35,7 @@ def extract_date_from_filename(format_name, match):
         time_str = match.group(2) + match.group(3).rjust(6, '0')  # HHMMSS part with extra digits
     elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX', 'IMGYYYYMMDDHHMMSS',
                          'WIN_YYYYMMDD_HH_MM_SS_Pro', 'VIDYYYYMMDDHHMMSS', 'SmartSelect_YYYYMMDD-HHMMSS_Gallery',
-                         'Screenshot_YYYYMMDD-HHMMSS'}:  # New patterns added
+                         'Screenshot_YYYYMMDD-HHMMSS', 'mateYYYYMMDDHHMMSS', 'InShot_YYYYMMDD_HHMMSS'}:
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2).replace("_", "") if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
     return date_str, time_str
@@ -63,7 +63,9 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'WIN_YYYYMMDD_HH_MM_SS_Pro': re.compile(r'^WIN_(\d{8})_(\d{2}_\d{2}_\d{2})_Pro\.\w+$'),
         'VIDYYYYMMDDHHMMSS': re.compile(r'^VID(\d{8})(\d{6})\.\w+$'),
         'SmartSelect_YYYYMMDD-HHMMSS_Gallery': re.compile(r'^SmartSelect_(\d{8})-(\d{6})_Gallery\.\w+$'),
-        'Screenshot_YYYYMMDD-HHMMSS': re.compile(r'^Screenshot_(\d{8})-(\d{6})_\w+\.\w+$'),  # New pattern for Screenshot_YYYYMMDD-HHMMSS
+        'Screenshot_YYYYMMDD-HHMMSS': re.compile(r'^Screenshot_(\d{8})-(\d{6})_\w+\.\w+$'),
+        'mateYYYYMMDDHHMMSS': re.compile(r'^mate(\d{8})(\d{6})\d*\.\w+$'),
+        'InShot_YYYYMMDD_HHMMSS': re.compile(r'^InShot_(\d{8})_(\d{6})\d*\.\w+$'),  # Added pattern for InShot_YYYYMMDD_HHMMSS
     }
 
     for file in files:
