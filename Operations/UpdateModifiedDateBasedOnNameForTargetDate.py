@@ -34,7 +34,8 @@ def extract_date_from_filename(format_name, match):
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2) + match.group(3).rjust(6, '0')  # HHMMSS part with extra digits
     elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX', 'IMGYYYYMMDDHHMMSS',
-                         'WIN_YYYYMMDD_HH_MM_SS_Pro', 'VIDYYYYMMDDHHMMSS'}:  # New patterns added
+                         'WIN_YYYYMMDD_HH_MM_SS_Pro', 'VIDYYYYMMDDHHMMSS', 'SmartSelect_YYYYMMDD-HHMMSS_Gallery',
+                         'Screenshot_YYYYMMDD-HHMMSS'}:  # New patterns added
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2).replace("_", "") if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
     return date_str, time_str
@@ -56,11 +57,13 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'YYYY-MM-DD HH.MM.SS-x.jpg': re.compile(r'^(\d{4}-\d{2}-\d{2}) (\d{2})\.(\d{2})\.(\d{2})-(\d+)\.jpg$'),
         'IMG_YYYYMMDD_HHMMSS_extra': re.compile(r'^IMG_(\d{8})_(\d{6})_(\d{1,6})\.\w+$'),
         'YYYYMMDD_HHMMSS(x).heic': re.compile(r'^(\d{8})_(\d{6})\(\d+\)\.heic$'),
-        'IMG-YYYYMMDD-WAXXXX': re.compile(r'^IMG-(\d{8})-WA\d+\.\w+$'),  # New pattern added
-        'VID-YYYYMMDD-WAXXXX': re.compile(r'^VID-(\d{8})-WA\d+\.\w+$'),  # New pattern for VID-YYYYMMDD-WAXXXX
-        'IMGYYYYMMDDHHMMSS': re.compile(r'^IMG(\d{8})(\d{6})\.\w+$'),  # New pattern for IMGYYYYMMDDHHMMSS
-        'WIN_YYYYMMDD_HH_MM_SS_Pro': re.compile(r'^WIN_(\d{8})_(\d{2}_\d{2}_\d{2})_Pro\.\w+$'),  # New pattern for WIN_YYYYMMDD_HH_MM_SS_Pro
-        'VIDYYYYMMDDHHMMSS': re.compile(r'^VID(\d{8})(\d{6})\.\w+$'),  # New pattern for VIDYYYYMMDDHHMMSS
+        'IMG-YYYYMMDD-WAXXXX': re.compile(r'^IMG-(\d{8})-WA\d+\.\w+$'),
+        'VID-YYYYMMDD-WAXXXX': re.compile(r'^VID-(\d{8})-WA\d+\.\w+$'),
+        'IMGYYYYMMDDHHMMSS': re.compile(r'^IMG(\d{8})(\d{6})\.\w+$'),
+        'WIN_YYYYMMDD_HH_MM_SS_Pro': re.compile(r'^WIN_(\d{8})_(\d{2}_\d{2}_\d{2})_Pro\.\w+$'),
+        'VIDYYYYMMDDHHMMSS': re.compile(r'^VID(\d{8})(\d{6})\.\w+$'),
+        'SmartSelect_YYYYMMDD-HHMMSS_Gallery': re.compile(r'^SmartSelect_(\d{8})-(\d{6})_Gallery\.\w+$'),
+        'Screenshot_YYYYMMDD-HHMMSS': re.compile(r'^Screenshot_(\d{8})-(\d{6})_\w+\.\w+$'),  # New pattern for Screenshot_YYYYMMDD-HHMMSS
     }
 
     for file in files:
