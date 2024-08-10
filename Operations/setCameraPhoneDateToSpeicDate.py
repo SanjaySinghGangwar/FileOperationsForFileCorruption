@@ -8,6 +8,7 @@ TARGET_DATE_1 = '2016-08-22'  # Target date for DSC00002 to DSC00150 (YYYY-MM-DD
 TARGET_DATE_2 = '2016-09-27'  # Target date for DSC00190 to DSC00250 (YYYY-MM-DD)
 TARGET_DATE_3 = '2015-01-20'  # Target date for DSC01608 to DSC01815 (YYYY-MM-DD)
 TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD)
+TARGET_DATE_5 = '2021-09-20'  # Target date for DSC02361 to DSC02514 (YYYY-MM-DD)
 TARGET_TIME = '120000'  # Example time (HHMMSS)
 
 
@@ -36,6 +37,8 @@ def extract_date_from_filename(format_name, match):
             date_str = TARGET_DATE_3.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         elif 2222 <= file_number <= 2360:
             date_str = TARGET_DATE_4.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        elif 2361 <= file_number <= 2514:
+            date_str = TARGET_DATE_5.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         else:
             return None, None
         time_str = TARGET_TIME  # Use the specific time
@@ -44,7 +47,7 @@ def extract_date_from_filename(format_name, match):
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
-        'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC02360
+        'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC02514
     }
 
     for file in files:
@@ -54,7 +57,7 @@ def update_creation_and_modified_date_from_filename(directory, files):
             continue
 
         file_number = int(match.group(1))
-        if (2 <= file_number <= 150) or (190 <= file_number <= 250) or (1608 <= file_number <= 1815) or (2222 <= file_number <= 2360):
+        if (2 <= file_number <= 150) or (190 <= file_number <= 250) or (1608 <= file_number <= 1815) or (2222 <= file_number <= 2360) or (2361 <= file_number <= 2514):
             creation_time = os.path.getctime(file_path)
             modified_time = os.path.getmtime(file_path)
             creation_date_obj = datetime.fromtimestamp(creation_time)
