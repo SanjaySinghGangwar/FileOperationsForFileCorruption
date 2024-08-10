@@ -36,8 +36,8 @@ def extract_date_from_filename(format_name, match):
     elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX', 'IMGYYYYMMDDHHMMSS',
                          'WIN_YYYYMMDD_HH_MM_SS_Pro', 'VIDYYYYMMDDHHMMSS', 'SmartSelect_YYYYMMDD-HHMMSS_Gallery',
                          'Screenshot_YYYYMMDD-HHMMSS', 'mateYYYYMMDDHHMMSS', 'InShot_YYYYMMDD_HHMMSS',
-                         'VID_YYYYMMDD_HHMMSS', 'Video.Guru_YYYYMMDD_HHMMSS'}:
-        date_str = match.group(1)  # YYYYMMDD part
+                         'VID_YYYYMMDD_HHMMSS', 'Video.Guru_YYYYMMDD_HHMMSS', 'YYYY-MM-DD_HHMMSS'}:
+        date_str = match.group(1).replace("-", "")  # YYYYMMDD part
         time_str = match.group(2).replace("_", "") if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
     return date_str, time_str
 
@@ -68,7 +68,8 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'mateYYYYMMDDHHMMSS': re.compile(r'^mate(\d{8})(\d{6})\d*\.\w+$'),
         'InShot_YYYYMMDD_HHMMSS': re.compile(r'^InShot_(\d{8})_(\d{6})\d*\.\w+$'),
         'VID_YYYYMMDD_HHMMSS': re.compile(r'^VID_(\d{8})_(\d{6})\d*\.\w+$'),
-        'Video.Guru_YYYYMMDD_HHMMSS': re.compile(r'^Video\.Guru_(\d{8})_(\d{6})\d*\.\w+$'),  # Added pattern for Video.Guru_YYYYMMDD_HHMMSS
+        'Video.Guru_YYYYMMDD_HHMMSS': re.compile(r'^Video\.Guru_(\d{8})_(\d{6})\d*\.\w+$'),
+        'YYYY-MM-DD_HHMMSS': re.compile(r'^(\d{4}-\d{2}-\d{2})_(\d{6})\.\w+$'),  # Added pattern for YYYY-MM-DD_HHMMSS
     }
 
     for file in files:
