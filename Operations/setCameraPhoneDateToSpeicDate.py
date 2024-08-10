@@ -7,9 +7,10 @@ from datetime import datetime
 TARGET_DATE_1 = '2016-08-22'  # Target date for DSC00002 to DSC00150 (YYYY-MM-DD)
 TARGET_DATE_2 = '2016-09-27'  # Target date for DSC00190 to DSC00250 (YYYY-MM-DD)
 TARGET_DATE_3 = '2015-01-20'  # Target date for DSC01608 to DSC01815 (YYYY-MM-DD)
-TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD)
+TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD) and new range
 TARGET_DATE_5 = '2021-09-20'  # Target date for DSC02361 to DSC02514 (YYYY-MM-DD)
 TARGET_DATE_6 = '2022-10-20'  # Target date for DSC04966 to DSC05037 (YYYY-MM-DD)
+TARGET_DATE_7 = '2021-07-25'  # Target date for 500041600447_536203 to 500172900935_107682 (YYYY-MM-DD)
 TARGET_TIME = '120000'  # Example time (HHMMSS)
 
 
@@ -44,64 +45,69 @@ def extract_date_from_filename(format_name, match):
             date_str = TARGET_DATE_6.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         else:
             return None, None
-        time_str = TARGET_TIME  # Use the specific time
-    return date_str, time_str
+    elif format_name == 'FILEID':
+        # Set the appropriate target date for new file pattern
+        file_number = int(match.group(1))
+        if 500041600447 <= file_number <= 500172900935:
+            date_str = TARGET_DATE_7.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        else:
+            return None, None
+    return date_str, TARGET_TIME
 
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
         'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC05037
+        'FILEID': re.compile(r'^(\d{15})_(\d+)\.\w+$'),  # Pattern for 500041600447_536203 to 500172900935_107682
     }
 
     for file in files:
         file_path = os.path.join(directory, file)
-        match = patterns['DSC'].match(file)
-        if not match:
-            continue
+        for format_name, pattern in patterns.items():
+            match = pattern.match(file)
+            if match:
+                creation_time = os.path.getctime(file_path)
+                modified_time = os.path.getmtime(file_path)
+                creation_date_obj = datetime.fromtimestamp(creation_time)
+                modified_date_obj = datetime.fromtimestamp(modified_time)
 
-        file_number = int(match.group(1))
-        if (2 <= file_number <= 150) or (190 <= file_number <= 250) or (1608 <= file_number <= 1815) or (2222 <= file_number <= 2360) or (2361 <= file_number <= 2514) or (4966 <= file_number <= 5037):
-            creation_time = os.path.getctime(file_path)
-            modified_time = os.path.getmtime(file_path)
-            creation_date_obj = datetime.fromtimestamp(creation_time)
-            modified_date_obj = datetime.fromtimestamp(modified_time)
+                try:
+                    date_str, time_str = extract_date_from_filename(format_name, match)
+                    if date_str is None:
+                        continue  # Skip files not in the target ranges
 
-            try:
-                date_str, time_str = extract_date_from_filename('DSC', match)
-                if date_str is None:
-                    continue  # Skip files not in the target ranges
+                    timestamp = format_timestamp(date_str, time_str)
 
-                timestamp = format_timestamp(date_str, time_str)
+                    # Check if timestamp is correctly formatted
+                    if len(timestamp) < 15 or len(timestamp) > 16:
+                        print(f"Invalid timestamp format for {file}: {timestamp}")
+                        continue
 
-                # Check if timestamp is correctly formatted
-                if len(timestamp) < 15 or len(timestamp) > 16:
-                    print(f"Invalid timestamp format for {file}: {timestamp}")
-                    continue
+                    # Convert extracted date and time to a datetime object
+                    file_date = datetime.strptime(date_str + time_str[:6], '%Y%m%d%H%M%S')
 
-                # Convert extracted date and time to a datetime object
-                file_date = datetime.strptime(date_str + time_str[:6], '%Y%m%d%H%M%S')
+                    # Check if both creation and modification dates already match
+                    if (creation_date_obj.date() == file_date.date() and creation_date_obj.time() == file_date.time() and
+                            modified_date_obj.date() == file_date.date() and modified_date_obj.time() == file_date.time()):
+                        print(f"{file} creation and modification dates already match the filename.")
+                        continue
 
-                # Check if both creation and modification dates already match
-                if (creation_date_obj.date() == file_date.date() and creation_date_obj.time() == file_date.time() and
-                        modified_date_obj.date() == file_date.date() and modified_date_obj.time() == file_date.time()):
-                    print(f"{file} creation and modification dates already match the filename.")
-                    continue
+                    # Update the modification date
+                    command = ['touch', '-t', timestamp, file_path]
+                    result = subprocess.run(command, check=True, capture_output=True)
 
-                # Update the modification date
-                command = ['touch', '-t', timestamp, file_path]
-                result = subprocess.run(command, check=True, capture_output=True)
+                    # Update the creation date on macOS using SetFile
+                    creation_command = ['SetFile', '-d', datetime.strftime(file_date, '%m/%d/%Y %H:%M:%S'), file_path]
+                    result_creation = subprocess.run(creation_command, check=True, capture_output=True)
 
-                # Update the creation date on macOS using SetFile
-                creation_command = ['SetFile', '-d', datetime.strftime(file_date, '%m/%d/%Y %H:%M:%S'), file_path]
-                result_creation = subprocess.run(creation_command, check=True, capture_output=True)
+                    if result.returncode == 0 and result_creation.returncode == 0:
+                        print(f"Updated creation and modification date for {file} to {timestamp}")
+                    else:
+                        print(f"Failed to update {file}: {result.stderr.decode()}")
 
-                if result.returncode == 0 and result_creation.returncode == 0:
-                    print(f"Updated creation and modification date for {file} to {timestamp}")
-                else:
-                    print(f"Failed to update {file}: {result.stderr.decode()}")
-
-            except Exception as e:
-                print(f"Failed to update {file}: {e}")
+                except Exception as e:
+                    print(f"Failed to update {file}: {e}")
+                break  # Stop after the first match
 
 
 # Example usage:
