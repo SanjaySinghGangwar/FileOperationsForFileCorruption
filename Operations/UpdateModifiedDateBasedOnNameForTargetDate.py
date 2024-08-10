@@ -3,15 +3,18 @@ import re
 import subprocess
 from datetime import datetime
 
+
 def list_files_in_directory(directory):
     """List all files in the given directory."""
     return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+
 
 def format_timestamp(date_str, time_str):
     """Format timestamp for touch command (YYYYMMDDHHMM.SS)"""
     time_str = time_str.ljust(6, '0')  # Pad time_str with zeros if it's shorter than 6 digits
     seconds = time_str[4:]
     return f'{date_str}{time_str[:2]}{time_str[2:4]}.{seconds}'
+
 
 def extract_date_from_filename(format_name, match):
     """Extract date from filename based on format"""
@@ -30,13 +33,11 @@ def extract_date_from_filename(format_name, match):
     elif format_name == 'IMG_YYYYMMDD_HHMMSS_extra':
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2) + match.group(3).rjust(6, '0')  # HHMMSS part with extra digits
-    elif format_name == 'IMG-YYYYMMDD-WAXXXX':  # New pattern for IMG-YYYYMMDD-WAXXXX
+    elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX'}:  # New pattern for IMG and VID formats
         date_str = match.group(1)  # YYYYMMDD part
         time_str = "000000"  # Default to midnight as there's no time part in the filename
-    elif format_name == 'Custom_IMG-YYYYMMDD-WAXXXX':  # Custom pattern for 271772459_18_IMG-20180518-WA0003
-        date_str = match.group(1).replace("-", "")  # YYYYMMDD part
-        time_str = "000000"  # Default to midnight as there's no time part in the filename
     return date_str, time_str
+
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
@@ -55,7 +56,7 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'IMG_YYYYMMDD_HHMMSS_extra': re.compile(r'^IMG_(\d{8})_(\d{6})_(\d{1,6})\.\w+$'),
         'YYYYMMDD_HHMMSS(x).heic': re.compile(r'^(\d{8})_(\d{6})\(\d+\)\.heic$'),
         'IMG-YYYYMMDD-WAXXXX': re.compile(r'^IMG-(\d{8})-WA\d+\.\w+$'),  # New pattern added
-        'Custom_IMG-YYYYMMDD-WAXXXX': re.compile(r'^\d+_\d+_IMG-(\d{8})-WA\d+\.\w+$'),  # Custom pattern for 271772459_18_IMG-20180518-WA0003
+        'VID-YYYYMMDD-WAXXXX': re.compile(r'^VID-(\d{8})-WA\d+\.\w+$'),  # New pattern for VID-YYYYMMDD-WAXXXX
     }
 
     for file in files:
