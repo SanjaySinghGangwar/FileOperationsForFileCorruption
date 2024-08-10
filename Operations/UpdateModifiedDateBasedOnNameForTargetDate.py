@@ -39,6 +39,9 @@ def extract_date_from_filename(format_name, match):
                          'VID_YYYYMMDD_HHMMSS', 'Video.Guru_YYYYMMDD_HHMMSS', 'YYYY-MM-DD_HHMMSS'}:
         date_str = match.group(1).replace("-", "")  # YYYYMMDD part
         time_str = match.group(2).replace("_", "") if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
+    elif format_name == 'YYYYMMDD_HHMMSS_capture(x)':
+        date_str = match.group(1)  # YYYYMMDD part
+        time_str = match.group(2)  # HHMMSS part
     return date_str, time_str
 
 
@@ -69,7 +72,8 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'InShot_YYYYMMDD_HHMMSS': re.compile(r'^InShot_(\d{8})_(\d{6})\d*\.\w+$'),
         'VID_YYYYMMDD_HHMMSS': re.compile(r'^VID_(\d{8})_(\d{6})\d*\.\w+$'),
         'Video.Guru_YYYYMMDD_HHMMSS': re.compile(r'^Video\.Guru_(\d{8})_(\d{6})\d*\.\w+$'),
-        'YYYY-MM-DD_HHMMSS': re.compile(r'^(\d{4}-\d{2}-\d{2})_(\d{6})\.\w+$'),  # Added pattern for YYYY-MM-DD_HHMMSS
+        'YYYY-MM-DD_HHMMSS': re.compile(r'^(\d{4}-\d{2}-\d{2})_(\d{6})\.\w+$'),
+        'YYYYMMDD_HHMMSS_capture(x)': re.compile(r'^(\d{8})_(\d{6})_capture\(\d+\)\.\w+$'),  # Added pattern for YYYYMMDD_HHMMSS_capture(x)
     }
 
     for file in files:
