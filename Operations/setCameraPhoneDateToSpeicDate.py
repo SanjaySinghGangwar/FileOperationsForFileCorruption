@@ -11,6 +11,7 @@ TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD
 TARGET_DATE_5 = '2021-09-20'  # Target date for DSC02361 to DSC02514 (YYYY-MM-DD)
 TARGET_DATE_6 = '2022-10-20'  # Target date for DSC04966 to DSC05037 (YYYY-MM-DD)
 TARGET_DATE_7 = '2021-07-25'  # Target date for 500041600447_536203 to 500172900935_107682 (YYYY-MM-DD)
+TARGET_DATE_8 = '2015-01-20'  # Target date for DSC_0205 to DSC_0436 (YYYY-MM-DD)
 TARGET_TIME = '120000'  # Example time (HHMMSS)
 
 
@@ -43,6 +44,8 @@ def extract_date_from_filename(format_name, match):
             date_str = TARGET_DATE_5.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         elif 4966 <= file_number <= 5037:
             date_str = TARGET_DATE_6.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        elif 205 <= file_number <= 436:
+            date_str = TARGET_DATE_8.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         else:
             return None, None
     elif format_name == 'FILEID':
@@ -57,7 +60,7 @@ def extract_date_from_filename(format_name, match):
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
-        'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC05037
+        'DSC': re.compile(r'^DSC_(\d{4,5})\.\w+$'),  # Pattern for DSC00002 to DSC05037 and DSC_0205 to DSC_0436
         'FILEID': re.compile(r'^(\d{15})_(\d+)\.\w+$'),  # Pattern for 500041600447_536203 to 500172900935_107682
     }
 
