@@ -3,8 +3,9 @@ import re
 import subprocess
 from datetime import datetime
 
-# Specify the target date and time here
-TARGET_DATE = '2016-12-22'  # Example date (YYYY-MM-DD)
+# Specify the target dates and times here
+TARGET_DATE_1 = '2016-08-22'  # Target date for DSC00002 to DSC00150 (YYYY-MM-DD)
+TARGET_DATE_2 = '2016-09-27'  # Target date for DSC00190 to DSC00250 (YYYY-MM-DD)
 TARGET_TIME = '120000'  # Example time (HHMMSS)
 
 
@@ -23,30 +24,41 @@ def format_timestamp(date_str, time_str):
 def extract_date_from_filename(format_name, match):
     """Extract date from filename based on format"""
     if format_name == 'DSC':
-        date_str = TARGET_DATE.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        # Set the appropriate target date based on file number
+        file_number = int(match.group(1))
+        if 2 <= file_number <= 150:
+            date_str = TARGET_DATE_1.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        elif 190 <= file_number <= 250:
+            date_str = TARGET_DATE_2.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
+        else:
+            return None, None
         time_str = TARGET_TIME  # Use the specific time
     return date_str, time_str
 
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
-        'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC00150
+        'DSC': re.compile(r'^DSC(\d{5})\.\w+$'),  # Pattern for DSC00002 to DSC00250
     }
 
     for file in files:
         file_path = os.path.join(directory, file)
-        if not patterns['DSC'].match(file):
+        match = patterns['DSC'].match(file)
+        if not match:
             continue
 
-        file_number = int(patterns['DSC'].match(file).group(1))
-        if 2 <= file_number <= 150:
+        file_number = int(match.group(1))
+        if (2 <= file_number <= 150) or (190 <= file_number <= 250):
             creation_time = os.path.getctime(file_path)
             modified_time = os.path.getmtime(file_path)
             creation_date_obj = datetime.fromtimestamp(creation_time)
             modified_date_obj = datetime.fromtimestamp(modified_time)
 
             try:
-                date_str, time_str = extract_date_from_filename('DSC', None)
+                date_str, time_str = extract_date_from_filename('DSC', match)
+                if date_str is None:
+                    continue  # Skip files not in the target ranges
+
                 timestamp = format_timestamp(date_str, time_str)
 
                 # Check if timestamp is correctly formatted
