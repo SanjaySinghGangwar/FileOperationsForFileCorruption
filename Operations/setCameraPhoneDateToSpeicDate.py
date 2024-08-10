@@ -11,9 +11,11 @@ TARGET_DATE_4 = '2021-07-19'
 TARGET_DATE_5 = '2021-09-20'
 TARGET_DATE_6 = '2022-10-20'
 TARGET_DATE_8 = '2015-01-20'
-TARGET_DATE_9 = '2012-10-27'  # For Photo-1918 to Photo-2050
-TARGET_DATE_10 = '2023-09-03'  # For IMG_2748 to IMG_2889
-TARGET_DATE_11 = '2023-09-17'  # New target date for IMG_3048 to IMG_3180
+TARGET_DATE_9 = '2012-10-27'
+TARGET_DATE_10 = '2023-09-03'
+TARGET_DATE_11 = '2023-09-17'
+TARGET_DATE_12 = '2020-12-20'
+TARGET_DATE_13 = '2023-05-23'  # New target date for IMG_1862 to IMG_1963
 TARGET_TIME = '120000'
 
 
@@ -51,20 +53,28 @@ def extract_date_from_filename(format_name, match):
             return None, None
     elif format_name == '500':
         date_str = TARGET_DATE_4.replace('-', '')
-    elif format_name == '13523':
-        date_str = TARGET_DATE_9.replace('-', '')  # For files starting with 13523
+    elif format_name == '1352':
+        date_str = TARGET_DATE_9.replace('-', '')
     elif format_name == 'Photo':
         file_number = int(match.group(1))
         if 1918 <= file_number <= 2050:
-            date_str = TARGET_DATE_9.replace('-', '')  # For Photo-1918 to Photo-2050
+            date_str = TARGET_DATE_9.replace('-', '')
         else:
             return None, None
     elif format_name == 'IMG':
         file_number = int(match.group(1))
         if 2748 <= file_number <= 2889:
-            date_str = TARGET_DATE_10.replace('-', '')  # For IMG_2748 to IMG_2889
+            date_str = TARGET_DATE_10.replace('-', '')
         elif 3048 <= file_number <= 3180:
-            date_str = TARGET_DATE_11.replace('-', '')  # New case for IMG_3048 to IMG_3180
+            date_str = TARGET_DATE_11.replace('-', '')
+        elif 1862 <= file_number <= 1963:
+            date_str = TARGET_DATE_13.replace('-', '')  # New case for IMG_1862 to IMG_1963
+        else:
+            return None, None
+    elif format_name == 'DJI':
+        file_number = int(match.group(1))
+        if 936 <= file_number <= 943:
+            date_str = TARGET_DATE_12.replace('-', '')
         else:
             return None, None
     return date_str, TARGET_TIME
@@ -74,9 +84,10 @@ def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
         'DSC': re.compile(r'^DSC_(\d{4,5})\.\w+$'),
         '500': re.compile(r'^500\d{9}_\d+\.\w*$'),
-        '13523': re.compile(r'^13523\d+\.\w+$'),
+        '1352': re.compile(r'^1352\d+\.\w+$'),
         'Photo': re.compile(r'^Photo-(\d{4})\.\w+$'),
-        'IMG': re.compile(r'^IMG_(\d{4})\.\w+$'),  # Updated pattern for IMG files
+        'IMG': re.compile(r'^IMG_(\d{4})\.\w+$'),
+        'DJI': re.compile(r'^DJI_(\d{4})\.\w+$'),
     }
 
     for file in files:
