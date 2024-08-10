@@ -27,15 +27,16 @@ def extract_date_from_filename(format_name, match):
     elif format_name in {'YYYYMMDD_HHMMSS(x)', 'YYYYMMDD_HHMMSS-x', 'IMG_YYYYMMDD_HHMMSSsss',
                          'IMG_YYYYMMDD_HHMMSS_milliseconds', 'YYYYMMDD_HHMMSS_milliseconds',
                          'YYYYMMDD_HHMMSS_milliseconds_001', 'YYYY-MM-DD HH.MM.SS.jpg',
-                         'YYYY-MM-DD HH.MM.SS-x.jpg', 'YYYYMMDD_HHMMSS(x).heic'}:  # Added pattern
+                         'YYYY-MM-DD HH.MM.SS-x.jpg', 'YYYYMMDD_HHMMSS(x).heic'}:
         date_str = match.group(1).replace("-", "")  # YYYYMMDD part
         time_str = match.group(2) + match.group(3)  # HHMMSS part
     elif format_name == 'IMG_YYYYMMDD_HHMMSS_extra':
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2) + match.group(3).rjust(6, '0')  # HHMMSS part with extra digits
-    elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX', 'IMGYYYYMMDDHHMMSS'}:  # New patterns added
+    elif format_name in {'IMG-YYYYMMDD-WAXXXX', 'VID-YYYYMMDD-WAXXXX', 'IMGYYYYMMDDHHMMSS',
+                         'WIN_YYYYMMDD_HH_MM_SS_Pro'}:  # New patterns added
         date_str = match.group(1)  # YYYYMMDD part
-        time_str = match.group(2) if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
+        time_str = match.group(2).replace("_", "") if len(match.groups()) > 1 else "000000"  # HHMMSS part or default to midnight
     return date_str, time_str
 
 
@@ -58,6 +59,7 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'IMG-YYYYMMDD-WAXXXX': re.compile(r'^IMG-(\d{8})-WA\d+\.\w+$'),  # New pattern added
         'VID-YYYYMMDD-WAXXXX': re.compile(r'^VID-(\d{8})-WA\d+\.\w+$'),  # New pattern for VID-YYYYMMDD-WAXXXX
         'IMGYYYYMMDDHHMMSS': re.compile(r'^IMG(\d{8})(\d{6})\.\w+$'),  # New pattern for IMGYYYYMMDDHHMMSS
+        'WIN_YYYYMMDD_HH_MM_SS_Pro': re.compile(r'^WIN_(\d{8})_(\d{2}_\d{2}_\d{2})_Pro\.\w+$'),  # New pattern for WIN_YYYYMMDD_HH_MM_SS_Pro
     }
 
     for file in files:
