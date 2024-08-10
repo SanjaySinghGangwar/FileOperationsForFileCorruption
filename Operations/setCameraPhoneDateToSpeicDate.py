@@ -15,7 +15,8 @@ TARGET_DATE_9 = '2012-10-27'
 TARGET_DATE_10 = '2023-09-03'
 TARGET_DATE_11 = '2023-09-17'
 TARGET_DATE_12 = '2020-12-20'
-TARGET_DATE_13 = '2023-05-23'  # New target date for IMG_1862 to IMG_1963
+TARGET_DATE_13 = '2023-05-23'
+TARGET_DATE_14 = '2022-10-20'  # New target date for IMG_0284 to IMG_0337
 TARGET_TIME = '120000'
 
 
@@ -68,7 +69,9 @@ def extract_date_from_filename(format_name, match):
         elif 3048 <= file_number <= 3180:
             date_str = TARGET_DATE_11.replace('-', '')
         elif 1862 <= file_number <= 1963:
-            date_str = TARGET_DATE_13.replace('-', '')  # New case for IMG_1862 to IMG_1963
+            date_str = TARGET_DATE_13.replace('-', '')
+        elif 284 <= file_number <= 337:  # Adjust this condition for the new range
+            date_str = TARGET_DATE_14.replace('-', '')
         else:
             return None, None
     elif format_name == 'DJI':
