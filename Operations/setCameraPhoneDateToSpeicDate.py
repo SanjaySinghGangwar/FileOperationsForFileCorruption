@@ -7,10 +7,9 @@ from datetime import datetime
 TARGET_DATE_1 = '2016-08-22'  # Target date for DSC00002 to DSC00150 (YYYY-MM-DD)
 TARGET_DATE_2 = '2016-09-27'  # Target date for DSC00190 to DSC00250 (YYYY-MM-DD)
 TARGET_DATE_3 = '2015-01-20'  # Target date for DSC01608 to DSC01815 (YYYY-MM-DD)
-TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD) and new range
+TARGET_DATE_4 = '2021-07-25'  # Target date for DSC02222 to DSC02360 (YYYY-MM-DD) and files starting with 5000
 TARGET_DATE_5 = '2021-09-20'  # Target date for DSC02361 to DSC02514 (YYYY-MM-DD)
 TARGET_DATE_6 = '2022-10-20'  # Target date for DSC04966 to DSC05037 (YYYY-MM-DD)
-TARGET_DATE_7 = '2021-07-25'  # Target date for 500041600447_536203 to 500172900935_107682 (YYYY-MM-DD)
 TARGET_DATE_8 = '2015-01-20'  # Target date for DSC_0205 to DSC_0436 (YYYY-MM-DD)
 TARGET_TIME = '120000'  # Example time (HHMMSS)
 
@@ -48,20 +47,15 @@ def extract_date_from_filename(format_name, match):
             date_str = TARGET_DATE_8.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
         else:
             return None, None
-    elif format_name == 'FILEID':
-        # Set the appropriate target date for new file pattern
-        file_number = int(match.group(1))
-        if 500041600447 <= file_number <= 500172900935:
-            date_str = TARGET_DATE_7.replace('-', '')  # Convert YYYY-MM-DD to YYYYMMDD
-        else:
-            return None, None
+    elif format_name == '5000':
+        date_str = TARGET_DATE_4.replace('-', '')  # Use TARGET_DATE_4 for files starting with 5000
     return date_str, TARGET_TIME
 
 
 def update_creation_and_modified_date_from_filename(directory, files):
     patterns = {
         'DSC': re.compile(r'^DSC_(\d{4,5})\.\w+$'),  # Pattern for DSC00002 to DSC05037 and DSC_0205 to DSC_0436
-        'FILEID': re.compile(r'^(\d{15})_(\d+)\.\w+$'),  # Pattern for 500041600447_536203 to 500172900935_107682
+        '5000': re.compile(r'^5000\d+\.\w+$'),  # Pattern for files starting with 5000
     }
 
     for file in files:
