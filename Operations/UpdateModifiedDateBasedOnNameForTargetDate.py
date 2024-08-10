@@ -33,6 +33,9 @@ def extract_date_from_filename(format_name, match):
     elif format_name == 'IMG_YYYYMMDD_HHMMSS_extra':
         date_str = match.group(1)  # YYYYMMDD part
         time_str = match.group(2) + match.group(3).rjust(6, '0')  # HHMMSS part with extra digits
+    elif format_name == 'IMG-YYYYMMDD-WAXXXX':  # New pattern for IMG-YYYYMMDD-WAXXXX
+        date_str = match.group(1)  # YYYYMMDD part
+        time_str = "000000"  # Default to midnight as there's no time part in the filename
     return date_str, time_str
 
 
@@ -51,7 +54,8 @@ def update_creation_and_modified_date_from_filename(directory, files):
         'YYYY-MM-DD HH.MM.SS.jpg': re.compile(r'^(\d{4}-\d{2}-\d{2}) (\d{2})\.(\d{2})\.(\d{2})\.jpg$'),
         'YYYY-MM-DD HH.MM.SS-x.jpg': re.compile(r'^(\d{4}-\d{2}-\d{2}) (\d{2})\.(\d{2})\.(\d{2})-(\d+)\.jpg$'),
         'IMG_YYYYMMDD_HHMMSS_extra': re.compile(r'^IMG_(\d{8})_(\d{6})_(\d{1,6})\.\w+$'),
-        'YYYYMMDD_HHMMSS(x).heic': re.compile(r'^(\d{8})_(\d{6})\(\d+\)\.heic$')  # New pattern added
+        'YYYYMMDD_HHMMSS(x).heic': re.compile(r'^(\d{8})_(\d{6})\(\d+\)\.heic$'),
+        'IMG-YYYYMMDD-WAXXXX': re.compile(r'^IMG-(\d{8})-WA\d+\.\w+$'),  # New pattern added
     }
 
     for file in files:
