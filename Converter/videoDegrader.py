@@ -53,11 +53,11 @@ def process_videos(input_directory, output_directory):
             logging.warning(f'Skipping {filename} due to an error reading resolution.')
             continue
 
-        if height > 720:
+        if height > 500:
             output_path = os.path.join(output_directory, f"{filename}")
             convert_to_480p(video_path, output_path)
         else:
-            logging.info(f'{filename} is already 720p or lower. Skipping conversion.')
+            logging.info(f'{filename} is already 420p or lower. Skipping conversion.')
 
 
 if __name__ == "__main__":
