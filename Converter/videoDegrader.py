@@ -62,5 +62,5 @@ def process_videos(watch_directory):
 
 
 if __name__ == "__main__":
-    watch_directory = "/Volumes/2 TB/Personal/Creative/ContentCreations/Raw/"  # Change to your watch directory
+    watch_directory = "/Volumes/2 TB/Personal/Creative/ContentCreations/Raw/NROP"  # Change to your watch directory
     process_videos(watch_directory)
